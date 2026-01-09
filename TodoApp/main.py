@@ -1,24 +1,11 @@
-from typing import Annotated
-from fastapi import Depends, FastAPI
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+from routers import auth, todo, user
 import models
-from models import TodoItem
-from database import engine, SessionLocal
+from database import engine
 
 app = FastAPI()
+app.include_router(auth.router)
+app.include_router(todo.router)
+app.include_router(user.router)
 
 models.Base.metadata.create_all(bind=engine)
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db 
-    finally:
-        db.close()
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
-@app.get("/todos")
-def read_todos(db: db_dependency):
-    todos = db.query(TodoItem).all()
-    return todos
