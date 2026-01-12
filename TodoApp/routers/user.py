@@ -6,13 +6,16 @@ from schemas import UserRequest
 from models import User
 from passlib.context import CryptContext
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],
+)
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@router.post("/user")
+@router.post("/")
 def create_user(db: db_dependency, user_request: UserRequest):
     
     existing_user = db.query(User).filter(
